@@ -1,3 +1,8 @@
+from random import choice, sample
+from itertools import combinations
+from math import ceil
+
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -45,8 +50,20 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        first_names = ["Liam", "Noah", "William", "James", "Oliver", "Benjamin", "Elijah", 
+            "Lucas", "Mason", "Logan", "Emma", "Olivia", "Ava", "Isabella", "Sophia", 
+            "Charlotte", "Mia", "Amelia", "Harper", "Evelyn"]
+        last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", 
+            "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", 
+            "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"]
+
+        for i in range(num_users):
+            self.add_user(f'{choice(first_names)} {choice(last_names)}')
 
         # Create friendships
+        new_friendships = sample(list(combinations(range(1, self.last_id+1), r=2)), k=ceil((avg_friendships*num_users)/2))
+        for item in new_friendships:
+            self.add_friendship(item[0], item[1])
 
     def get_all_social_paths(self, user_id):
         """
@@ -59,6 +76,18 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        friend_stack = [(friend, [user_id, friend]) for friend in self.friendships[user_id]]
+
+        while friend_stack:
+            friend_id, path = friend_stack.pop(0)
+
+            if friend_id is not user_id and friend_id not in visited:
+                visited[friend_id] = path
+
+                for secondary_friend in self.friendships[friend_id]:
+                    if secondary_friend is not user_id and secondary_friend not in visited:
+                        friend_stack.append( (secondary_friend, path + [secondary_friend]) )
+
         return visited
 
 
